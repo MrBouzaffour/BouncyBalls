@@ -82,7 +82,7 @@ void step(struct Circle* circle)
 	if (circle->y + circle->radius > HEIGHT)
         {
                 circle->y = HEIGHT - circle->radius;
-                circle->v_y = -circle->v_x;
+                circle->v_y = -circle->v_y;
         }
 	
 	if ( circle->y  - circle->radius < 0)
