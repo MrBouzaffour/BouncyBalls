@@ -102,17 +102,25 @@ void UpdateTrajectory(struct Circle trajectory[TRAJECTORY_LENGTH],struct Circle 
 	if ( current_index >= TRAJECTORY_LENGTH)
 	{
 		// shift array - write the circle at the end of the array
+	
 		struct Circle trajectory_shifted_copy[TRAJECTORY_LENGTH];
-		for (int i = 0; i< TRAJECTORY_LENGTH; i++)
+		
+		// Shift all elements one position to the left
+		for (int i = 1; i< TRAJECTORY_LENGTH; i++)
 		{
-			if(i>0)
-				trajectory_shifted_copy[i] = trajectory[i+1];
+			trajectory_shifted_copy[i-1] = trajectory[i];
 		}
+
+		// Add the new circle at the last position
+		trajectory_shifted_copy[TRAJECTORY_LENGTH - 1 ] = circle;
+
+		// Copy back the shifted array to the original trajectory array
 		for (int i = 0; i<TRAJECTORY_LENGTH -1; i++)
 			trajectory[i] = trajectory_shifted_copy[i];
-		trajectory[current_index] = circle;
+		
 	}	
 	else{
+		// Simply add the new circle at the current index if not full
 		trajectory[current_index] = circle;
 	}
 
