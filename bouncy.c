@@ -48,25 +48,44 @@ void FillCircle(SDL_Surface* surface, struct Circle circle)
 void step(struct Circle* circle)
 {
 	// we calculate the new position
+	
+
+	// Update position based on velocity
 	circle->x += circle->v_x;
 	circle->y += circle->v_y;
+
+	// Update vertical velocity based on gravity
 	circle->v_y += A_GRAVITY;
 	
-	// if the ball exits the screan
-	if (circle->x + circle->radius ->WIDTH)
+	// Reflect off the right and left edges
+	if (circle->x + circle->radius > WIDTH)
 	{
-		circle->x = WIDTH;
+		circle->x = WIDTH - circle->radius;
 		circle->v_x = -circle->v_x;
 	}
-	if (circle->y + circle->radius ->HEIGHT)
+
+	// Refect off the bottom and top edges
+	if (circle->y + circle->radius > HEIGHT)
         {
-                circle->y = HEIGHT;
+                circle->y = HEIGHT - circle->radius;
                 circle->v_y = -circle->v_x;
+        }
+	
+	if ( circle->y  - circle->radius < 0)
+	{
+		circle->y = circle->radius;
+		circle->v_y = -circle->v_y;
+	}
+	if ( circle->x  - circle->radius < 0)
+        {
+                circle->x = circle->radius;
+                circle->v_x = -circle->v_x;
         }
 }
 
 
 int main() {
+
 	// Initilized SDL
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         	fprintf(stderr, "Could not initialize SDL: %s\n", SDL_GetError());
@@ -88,7 +107,6 @@ int main() {
 
 	// Get the window surface
     	SDL_Surface* surface = SDL_GetWindowSurface(window);
-	
 	if (!surface) {
         	fprintf(stderr, "Failed to get window surface: %s\n", SDL_GetError());
         	SDL_DestroyWindow(window);
@@ -97,7 +115,7 @@ int main() {
     	}
 
 	// Define a rectangle
-	SDL_Rect rect = (SDL_Rect) {200, 200, 200, 200};
+	//SDL_Rect rect = (SDL_Rect) {200, 200, 200, 200};
 
 
         struct Circle circle = (struct Circle) {200, 200, 100, 0, 0};
