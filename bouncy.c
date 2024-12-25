@@ -130,6 +130,15 @@ int main() {
 			{
 				simulation_running = 0;
 			}
+
+			// We close the window when we Space bar is pressed
+			if (event.type == SDL_KEYDOWN)
+			{
+				if (event.key.keysym.sym == SDLK_SPACE)
+				{
+					simulation_running = 0;
+				}
+			}
 		}
 		SDL_FillRect(surface, &erase_rect, COLOR_BLACK);
 		FillCircle(surface, circle);
