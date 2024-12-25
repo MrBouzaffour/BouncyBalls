@@ -155,17 +155,15 @@ int main() {
        		return 1;
     	}
 
-	// Define a rectangle
-	//SDL_Rect rect = (SDL_Rect) {200, 200, 200, 200};
-
-
         struct Circle circle = (struct Circle) {200, 200, 100, 10, 10};
 	struct Circle trajectory[TRAJECTORY_LENGTH];
+	
 	int current_trajectory_index  = 0;
 
 	SDL_Rect erase_rect = (SDL_Rect){0, 0, WIDTH, HEIGHT};
 	SDL_Event event;
 	int simulation_running = 1;
+	
 	while (simulation_running)
 	{
 		while (SDL_PollEvent(&event))
@@ -184,13 +182,22 @@ int main() {
 				}
 			}
 		}
+		
 		SDL_FillRect(surface, &erase_rect, COLOR_BACKGROUND);
 		FillCircle(surface, circle, COLOR_WHITE);
 		FillTrajectory(surface, trajectory, current_trajectory_index, COLOR_GRAY);
 		
 
 		step(&circle);
-		UpdateTrajectory(trajectory, circle, current_trajectory_index);
+		
+		//UpdateTrajectory(trajectory, circle, current_trajectory_index);
+		// Update the trajectory
+       		if (current_trajectory_index < TRAJECTORY_LENGTH) {
+         		trajectory[current_trajectory_index++] = circle;
+        	} else {
+            		UpdateTrajectory(trajectory, circle, TRAJECTORY_LENGTH);
+        	}
+
 		SDL_UpdateWindowSurface(window);
 		
 		SDL_Delay(20);
