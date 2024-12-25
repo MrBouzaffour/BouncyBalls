@@ -8,26 +8,31 @@
 #define COLOR_WHITE 0Xffffffff
 #define COLOR_BLACK 0x00000000
 
+#define A_GRAVITY 0.2
+
+
 struct Circle
 {
-	int x;
-	int y;
-	int radius;
+	double x;
+	double y;
+	double radius;
+	double v_x;
+	double v_y;
 };
 
 
 void FillCircle(SDL_Surface* surface, struct Circle circle)
 {
-	int low_x = circle.x - circle.radius;
-	int low_y = circle.y - circle.radius;
-	int high_x = circle.x + circle.radius;
-	int high_y = circle.y + circle.radius;
+	double low_x = circle.x - circle.radius;
+	double low_y = circle.y - circle.radius;
+	double high_x = circle.x + circle.radius;
+	double high_y = circle.y + circle.radius;
 
-	int  radius_squared = circle.radius * circle.radius;
+	double  radius_squared = circle.radius * circle.radius;
 
-	for (int x = low_x; x < high_x; x++)
+	for (double x = low_x; x < high_x; x++)
 	{ 
-		for (int y = low_y; y < high_y; y++ )
+		for (double y = low_y; y < high_y; y++ )
 		{
 			// we to check if it is int the circute
 			int center_distance_squared = ( x - circle.x ) * ( x - circle.x) + ( y - circle.y) * ( y - circle.y );
@@ -39,6 +44,28 @@ void FillCircle(SDL_Surface* surface, struct Circle circle)
 		}
 	}
 }
+
+void step(struct Circle* circle)
+{
+	// we calculate the new position
+	circle->x += circle->v_x;
+	circle->y += circle->v_y;
+	circle->v_y += A_GRAVITY;
+	
+	// if the ball exits the screan
+	if (circle->x + circle->radius ->WIDTH)
+	{
+		circle->x = WIDTH;
+		circle->v_x = -circle->v_x;
+	}
+	if (circle->y + circle->radius ->HEIGHT)
+        {
+                circle->y = HEIGHT;
+                circle->v_y = -circle->v_x;
+        }
+}
+
+
 int main() {
 	// Initilized SDL
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -68,24 +95,37 @@ int main() {
         	SDL_Quit();
        		return 1;
     	}
-	/*
+
 	// Define a rectangle
 	SDL_Rect rect = (SDL_Rect) {200, 200, 200, 200};
 
-	// Fill the rectangle with white
-	SDL_FillRect(surface, &rect, 0xffffffff);
-	*/
 
-	struct Circle circle = (struct Circle) {200, 200, 50};
-	FillCircle(surface,circle);
+        struct Circle circle = (struct Circle) {200, 200, 100, 0, 0};
+	SDL_Rect erase_rect = (SDL_Rect){0, 0, WIDTH, HEIGHT};
+	SDL_Event event;
+	int simulation_running = 1;
+	while (simulation_running)
+	{
+		while (SDL_PollEvent(&event))
+		{
+			if (event.type == SDL_QUIT)
+			{
+				simulation_running = 0;
+			}
+		}
+		SDL_FillRect(surface, &erase_rect, COLOR_BLACK);
+		FillCircle(surface, circle);
+		step(&circle);
+		SDL_UpdateWindowSurface(window);
+		
+		SDL_Delay(20);
 	
-	
-	
-	// Update the window surface
-        SDL_UpdateWindowSurface(window);
-       
+	}
+
+
+
 	// Delay for a short while so we can see the window
-	SDL_Delay(3000);
+	//SDL_Delay(3000);
 
 	// Clean up
 	SDL_DestroyWindow(window);
