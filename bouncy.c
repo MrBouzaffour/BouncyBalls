@@ -7,9 +7,12 @@
 
 #define COLOR_WHITE 0Xffffffff
 #define COLOR_BLACK 0x00000000
+#define COLOR_BACKGROUND 0X02020202
+#define COLOR_GRAY 0xf1f1f1f1
+
 
 #define A_GRAVITY 0.2
-
+#define TRAJECTORY_LENGTH 100
 
 struct Circle
 {
@@ -21,7 +24,7 @@ struct Circle
 };
 
 
-void FillCircle(SDL_Surface* surface, struct Circle circle)
+void FillCircle(SDL_Surface* surface, struct Circle circle, Uint32 color)
 {
 	double low_x = circle.x - circle.radius;
 	double low_y = circle.y - circle.radius;
@@ -39,10 +42,21 @@ void FillCircle(SDL_Surface* surface, struct Circle circle)
 			if ( center_distance_squared < radius_squared )
 			{
 				SDL_Rect pixel = (SDL_Rect) {x,y,1,1}; // pixel
-				SDL_FillRect(surface, &pixel, COLOR_WHITE);
+				SDL_FillRect(surface, &pixel, color);
 			}
 		}
 	}
+}
+
+
+
+void FillTrajectory(SDL_Surface* surface, struct Circle trajectory[TRAJECTORY_LENGTH], int current_trajectory_index, Uint32 color)
+{
+	for (int i = 0; i < current_trajectory_index ; i ++)
+	{
+		FillCircle(surface, trajectory[i], COLOR_GRAY);
+	}
+
 }
 
 void step(struct Circle* circle)
@@ -83,7 +97,26 @@ void step(struct Circle* circle)
         }
 }
 
+void UpdateTrajectory(struct Circle trajectory[TRAJECTORY_LENGTH],struct Circle circle, int current_index)
+{
+	if ( current_index >= TRAJECTORY_LENGTH)
+	{
+		// shift array - write the circle at the end of the array
+		struct Circle trajectory_shifted_copy[TRAJECTORY_LENGTH];
+		for (int i = 0; i< TRAJECTORY_LENGTH; i++)
+		{
+			if(i>0)
+				trajectory_shifted_copy[i] = trajectory[i+1];
+		}
+		for (int i = 0; i<TRAJECTORY_LENGTH -1; i++)
+			trajectory[i] = trajectory_shifted_copy[i];
+		trajectory[current_index] = circle;
+	}	
+	else{
+		trajectory[current_index] = circle;
+	}
 
+}
 int main() {
 
 	// Initilized SDL
@@ -118,7 +151,10 @@ int main() {
 	//SDL_Rect rect = (SDL_Rect) {200, 200, 200, 200};
 
 
-        struct Circle circle = (struct Circle) {200, 200, 100, 0, 0};
+        struct Circle circle = (struct Circle) {200, 200, 100, 10, 10};
+	struct Circle trajectory[TRAJECTORY_LENGTH];
+	int current_trajectory_index  = 0;
+
 	SDL_Rect erase_rect = (SDL_Rect){0, 0, WIDTH, HEIGHT};
 	SDL_Event event;
 	int simulation_running = 1;
@@ -140,9 +176,13 @@ int main() {
 				}
 			}
 		}
-		SDL_FillRect(surface, &erase_rect, COLOR_BLACK);
-		FillCircle(surface, circle);
+		SDL_FillRect(surface, &erase_rect, COLOR_BACKGROUND);
+		FillCircle(surface, circle, COLOR_WHITE);
+		FillTrajectory(surface, trajectory, current_trajectory_index, COLOR_GRAY);
+		
+
 		step(&circle);
+		UpdateTrajectory(trajectory, circle, current_trajectory_index);
 		SDL_UpdateWindowSurface(window);
 		
 		SDL_Delay(20);
