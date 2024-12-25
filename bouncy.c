@@ -97,7 +97,7 @@ int main() {
     	SDL_Window* window = SDL_CreateWindow("Bouncy Ball",
 						SDL_WINDOWPOS_CENTERED,
 					       	SDL_WINDOWPOS_CENTERED,
-					       	WIDTH, HEIGHT, 0);
+					       	WIDTH, HEIGHT, SDL_WINDOW_BORDERLESS);
 	if (!window) {
         	fprintf(stderr, "Failed to create window: %s\n", SDL_GetError());
         	SDL_Quit();
