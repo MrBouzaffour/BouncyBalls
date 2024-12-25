@@ -26,16 +26,15 @@ void FillCircle(SDL_Surface* surface, struct Circle circle)
 	int  radius_squared = circle.radius * circle.radius;
 
 	for (int x = low_x; x < high_x; x++)
-	{    SDL_DestroyWindow(window);
+	{ 
 		for (int y = low_y; y < high_y; y++ )
 		{
 			// we to check if it is int the circute
-			int center_distance_squared = x*x + y*y;
+			int center_distance_squared = ( x - circle.x ) * ( x - circle.x) + ( y - circle.y) * ( y - circle.y );
 			if ( center_distance_squared < radius_squared )
 			{
-				SDL_FillRect(surface,
-						&((SDL_Rect){x,y,1,1}),
-						COLOR_WHITE);
+				SDL_Rect pixel = (SDL_Rect) {x,y,1,1}; // pixel
+				SDL_FillRect(surface, &pixel, COLOR_WHITE);
 			}
 		}
 	}
@@ -69,16 +68,22 @@ int main() {
         	SDL_Quit();
        		return 1;
     	}
-
+	/*
 	// Define a rectangle
 	SDL_Rect rect = (SDL_Rect) {200, 200, 200, 200};
 
 	// Fill the rectangle with white
 	SDL_FillRect(surface, &rect, 0xffffffff);
+	*/
+
+	struct Circle circle = (struct Circle) {200, 200, 50};
+	FillCircle(surface,circle);
+	
+	
 	
 	// Update the window surface
-	SDL_UpdateWindowSurface(window);
-	
+        SDL_UpdateWindowSurface(window);
+       
 	// Delay for a short while so we can see the window
 	SDL_Delay(3000);
 
