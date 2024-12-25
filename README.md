@@ -1,6 +1,6 @@
 # BouncyBall
-
+to run the code:
 ```bash
-cc -o bouncy bouncy.c `sdl2-config --cflags --libs`
+make
 ./bouncy
 ```
