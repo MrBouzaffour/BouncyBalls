@@ -9,10 +9,14 @@
 #define COLOR_BLACK 0x00000000
 #define COLOR_BACKGROUND 0X02020202
 #define COLOR_GRAY 0xf1f1f1f1
-
+#define COLOR_TRAJECTORY 0xff763b
 
 #define A_GRAVITY 0.2
+#define DAMPENING 0.9
+
 #define TRAJECTORY_LENGTH 100
+
+#define TRAJECTORY_WIDTH 10
 
 struct Circle
 {
@@ -49,12 +53,13 @@ void FillCircle(SDL_Surface* surface, struct Circle circle, Uint32 color)
 }
 
 
-
 void FillTrajectory(SDL_Surface* surface, struct Circle trajectory[TRAJECTORY_LENGTH], int current_trajectory_index, Uint32 color)
 {
-	for (int i = 0; i < current_trajectory_index ; i ++)
+	for (int i = 0; i < current_trajectory_index ; i++)
 	{
-		FillCircle(surface, trajectory[i], COLOR_GRAY);
+		double trajectory_size =  TRAJECTORY_WIDTH / i * i / 100;
+		trajectory[i].radius = trajectory_size;
+		FillCircle(surface, trajectory[i], COLOR_TRAJECTORY);
 	}
 
 }
@@ -63,7 +68,6 @@ void step(struct Circle* circle)
 {
 	// we calculate the new position
 	
-
 	// Update position based on velocity
 	circle->x += circle->v_x;
 	circle->y += circle->v_y;
@@ -75,25 +79,25 @@ void step(struct Circle* circle)
 	if (circle->x + circle->radius > WIDTH)
 	{
 		circle->x = WIDTH - circle->radius;
-		circle->v_x = -circle->v_x;
+		circle->v_x = -circle->v_x * DAMPENING;
 	}
 
 	// Refect off the bottom and top edges
 	if (circle->y + circle->radius > HEIGHT)
         {
                 circle->y = HEIGHT - circle->radius;
-                circle->v_y = -circle->v_y;
+                circle->v_y = -circle->v_y * DAMPENING;
         }
 	
 	if ( circle->y  - circle->radius < 0)
 	{
 		circle->y = circle->radius;
-		circle->v_y = -circle->v_y;
+		circle->v_y = -circle->v_y * DAMPENING;
 	}
 	if ( circle->x  - circle->radius < 0)
         {
                 circle->x = circle->radius;
-                circle->v_x = -circle->v_x;
+                circle->v_x = -circle->v_x * DAMPENING;
         }
 }
 
@@ -103,21 +107,27 @@ void UpdateTrajectory(struct Circle trajectory[TRAJECTORY_LENGTH],struct Circle 
 	{
 		// shift array - write the circle at the end of the array
 	
-		struct Circle trajectory_shifted_copy[TRAJECTORY_LENGTH];
+		struct Circle trajectory_shifted_copy[current_index];
 		
 		// Shift all elements one position to the left
-		for (int i = 1; i< TRAJECTORY_LENGTH; i++)
+		for (int i = 0; i< current_index; i++)
 		{
-			trajectory_shifted_copy[i-1] = trajectory[i];
+			if (i>0)
+				trajectory_shifted_copy[i] = trajectory_shifted_copy[i+1];
+		}
+		
+		for (int i = 0; i < current_index; i++)
+		{
+			trajectory[i] = trajectory_shifted_copy[i];
 		}
 
 		// Add the new circle at the last position
-		trajectory_shifted_copy[TRAJECTORY_LENGTH - 1 ] = circle;
+		//trajectory_shifted_copy[TRAJECTORY_LENGTH - 1 ] = circle;
 
 		// Copy back the shifted array to the original trajectory array
-		for (int i = 0; i<TRAJECTORY_LENGTH -1; i++)
-			trajectory[i] = trajectory_shifted_copy[i];
-		
+		//for (int i = 0; i<TRAJECTORY_LENGTH -1; i++)
+		//	trajectory[i] = trajectory_shifted_copy[i];
+		trajectory[current_index] = circle;
 	}	
 	else{
 		// Simply add the new circle at the current index if not full
@@ -155,7 +165,7 @@ int main() {
        		return 1;
     	}
 
-        struct Circle circle = (struct Circle) {200, 200, 100, 10, 10};
+        struct Circle circle = (struct Circle) {200, 200, 80, 50, 50};
 	struct Circle trajectory[TRAJECTORY_LENGTH];
 	
 	int current_trajectory_index  = 0;
@@ -165,7 +175,7 @@ int main() {
 	int simulation_running = 1;
 	
 	while (simulation_running)
-	{
+	{  
 		while (SDL_PollEvent(&event))
 		{
 			if (event.type == SDL_QUIT)
@@ -184,25 +194,23 @@ int main() {
 		}
 		
 		SDL_FillRect(surface, &erase_rect, COLOR_BACKGROUND);
-		FillCircle(surface, circle, COLOR_WHITE);
 		FillTrajectory(surface, trajectory, current_trajectory_index, COLOR_GRAY);
+		FillCircle(surface, circle, COLOR_WHITE);
+		//FillTrajectory(surface, trajectory, current_trajectory_index, COLOR_GRAY);
 		
 
 		step(&circle);
 		
-		//UpdateTrajectory(trajectory, circle, current_trajectory_index);
+		UpdateTrajectory(trajectory, circle, current_trajectory_index);
 		// Update the trajectory
-       		if (current_trajectory_index < TRAJECTORY_LENGTH) {
-         		trajectory[current_trajectory_index++] = circle;
-        	} else {
-            		UpdateTrajectory(trajectory, circle, TRAJECTORY_LENGTH);
-        	}
-
+       		if (current_trajectory_index < TRAJECTORY_LENGTH){ 
+         		++current_trajectory_index;
+		}
 		SDL_UpdateWindowSurface(window);
 		
 		SDL_Delay(20);
 	
-	}
+
 
 
 
@@ -214,4 +222,4 @@ int main() {
 	SDL_Quit();
     	return 0;
 }
-
+}
