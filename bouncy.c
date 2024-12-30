@@ -53,7 +53,7 @@ void FillCircle(SDL_Surface* surface, struct Circle circle, Uint32 color)
 }
 
 
-void FillTrajectory(SDL_Surface* surface, struct Circle trajectory[TRAJECTORY_LENGTH], int current_trajectory_index, Uint32 color)
+void FillTrajectory(SDL_Surface* surface, struct Circle trajectory[TRAJECTORY_LENGTH], int current_trajectory_index)
 {
     for (int i = 0; i < current_trajectory_index; i++)
     {
@@ -175,7 +175,7 @@ int main() {
 		}
 		
 		SDL_FillRect(surface, &erase_rect, COLOR_BACKGROUND);
-		FillTrajectory(surface, trajectory, current_trajectory_index, COLOR_GRAY);
+		FillTrajectory(surface, trajectory, current_trajectory_index);
 		FillCircle(surface, circle, COLOR_WHITE);
 
 		step(&circle);
