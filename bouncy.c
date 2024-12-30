@@ -64,21 +64,6 @@ void FillTrajectory(SDL_Surface* surface, struct Circle trajectory[TRAJECTORY_LE
     }
 }
 
-/*
-void FillTrajectory(SDL_Surface* surface, struct Circle trajectory[TRAJECTORY_LENGTH], int current_trajectory_index, Uint32 color)
-{
-	for (int i = 0; i < current_trajectory_index ; i++)
-	{
-		double trajectory_size = TRAJECTORY_WIDTH;
-		if(i > 0){
-			trajectory_size = TRAJECTORY_WIDTH * (100 - i) / 100.0;
-		}
-
-		trajectory[i].radius = trajectory_size;
-		FillCircle(surface, trajectory[i], COLOR_TRAJECTORY);
-	}
-}
-*/
 void step(struct Circle* circle)
 {
 	// we calculate the new position
@@ -132,37 +117,6 @@ void UpdateTrajectory(struct Circle trajectory[TRAJECTORY_LENGTH], struct Circle
     }
 }
 
-/*
-void UpdateTrajectory(struct Circle trajectory[TRAJECTORY_LENGTH],struct Circle circle, int *current_index)
-{
-	if ( *current_index >= TRAJECTORY_LENGTH)
-	{
-		// shift array - write the circle at the end of the array
-	
-		// * struct Circle trajectory_shifted_copy[current_index];
-		
-		// Shift all elements one position to the left
-		for (int i = 1; i< TRAJECTORY_LENGTH; i++)
-		{
-			trajectory[i-1] = trajectory[i];
-		}
-		trajectory[TRAJECTORY_LENGTH - 1] = circle;
-
-		// Add the new circle at the last position
-		//trajectory_shifted_copy[TRAJECTORY_LENGTH - 1 ] = circle;
-
-		// Copy back the shifted array to the original trajectory array
-		//for (int i = 0; i<TRAJECTORY_LENGTH -1; i++)
-		//	trajectory[i] = trajectory_shifted_copy[i];
-	}	
-	else{
-		// Simply add the new circle at the current index if not full
-		trajectory[*current_index] = circle;
-		(*current_index)++;
-	}
-
-}
-*/
 int main() {
 
 	// Initilized SDL
