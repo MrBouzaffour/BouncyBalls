@@ -23,7 +23,7 @@ struct Circle
 	double x;
 	double y;
 	double radius;
-	double v_x;
+	double v_x; // velocity
 	double v_y;
 };
 
